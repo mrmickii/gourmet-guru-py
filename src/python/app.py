@@ -10,7 +10,29 @@ data.drop_duplicates(inplace=True)
 
 greetings = ["hello", "hi", "hey", "howdy", "greetings"]
 goodbyes = ["bye", "goodbye", "see you", "farewell", "take care"]
-recommendation_phrases = ["recommend a local food restaurant", "suggest a local restaurant", "find a local food place", "local food recommendation"]
+recommendation_phrases = [
+    "recommend a local food restaurant",
+    "suggest a local restaurant",
+    "find a local food place",
+    "local food recommendation",
+    "recommend me a nearby restaurant",
+    "suggest a place to eat nearby",
+    "what's a good local restaurant?",
+    "show me popular local eateries",
+    "where can I find delicious local cuisine?",
+    "recommend a dining spot with local dishes"
+]
+cuisine_types = [
+    "Seafood", "French", "Filipino", "American", "Cafe", "Barbecue",
+    "Italian", "Breakfast", "Spanish", "Fine Dining", "Dessert",
+    "Mediterranean", "Mexican", "European"
+]
+
+cuisine_phrases = []
+for cuisine in cuisine_types:
+    cuisine_phrases.append(f"suggest a {cuisine.lower()} restaurant")
+    cuisine_phrases.append(f"recommend a {cuisine.lower()} restaurant")
+
 
 def get_restaurant_recommendations(location, cuisine, price_level):
     filtered_data = data[data['Location'].str.contains(location, case=False, na=False)]
@@ -45,6 +67,17 @@ def chat():
                 response["message"] += f"- {restaurant['Name']} - {restaurant['Street Address']} - {restaurant['Location']}\n"
         else:
             response["message"] += "Sorry, I couldn't find any local food restaurant recommendations.\n"
+    elif any(phrase in user_input for phrase in cuisine_phrases):
+        for cuisine in cuisine_types:
+            if cuisine.lower() in user_input:
+                recommendations = get_restaurant_recommendations("Cebu City, Philippines", cuisine, 2)
+                if recommendations:
+                    response["message"] = f"Here are some {cuisine} restaurants in Cebu City, Philippines:\n"
+                    for restaurant in recommendations:
+                        response["message"] += f"- {restaurant['Name']} - {restaurant['Street Address']} - {restaurant['Location']}\n"
+                else:
+                    response["message"] = f"Sorry, I couldn't find any {cuisine} restaurants in Cebu City, Philippines.\n"
+                break
     else:
         recommendations = get_restaurant_recommendations("Cebu City, Philippines", user_input, 2)
         if recommendations:
